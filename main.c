@@ -29,14 +29,49 @@ unsigned char *physmem = 0;
 /* Global pointer to the virtual memory spacet */
 unsigned char *virtmem = 0;
 
+/* frame_table[frame] = page if full;  -1 if empty */
+int *frame_table;
+
+/* global variable to identify the algorithm we should use -- given to us in main() */
+const char *algoname;
+
+/* find an available frame using a selected replacement alg */
+int freeFrameFinder(struct page_table *pt, int page, int *kicked) { 
+	// is there a frame currently free to fill? 
+	for (int i = 0; i < page_table_get_nframes(pt); i++) {
+		if (frame_table[i] == -1) {
+			*kicked = -1; 
+			return i; // location of frame to use 
+		}
+	}
+	if (!strcmp(algoname, "rand")) { // started with this because he said to do rand first but then it does not work without the other stuff i think 
+        // just pick one & go 
+		int replacedFrame = rand() % page_table_get_nframes(pt); // make sure value is an actual frame 
+		*kicked = frame_table[replacedFrame];
+		return replacedFrame; 
+    } else if (!strcmp(algoname, "clock")) {
+        // CLOCK logic from class 
+    } else if (!strcmp(algoname, "custom")) {
+        // what we have come up with
+    }
+}
 /* A dummy page fault handler to start.  This is where most of your work goes. */
-void page_fault_handler( struct page_table *pt, int page )
+void page_fault_handler(struct page_table *pt, int page )
 {
-	// page N maps directly to frame N: 
-	page_table_set_entry(pt, page, page, BIT_PRESENT | BIT_WRITE);
+	/* // try it out portion -- page N maps directly to frame N: 
+	page_table_set_entry(pt, page, page, BIT_PRESENT | BIT_WRITE); */
+	int frame = find_frame(pt, page, &kicked);
+	page_table_set_entry(pt, page, frame, BIT_PRESENT);
 	/* original dummy code
 	printf("page fault on page #%d\n",page);
 	exit(1); */
+
+	// actual attempt: 
+	// int frame; 
+	//int bits; 
+	//page_table_get_entry(pt, page, &frame, &bits);
+
+
 }
 
 int main( int argc, char *argv[] )
