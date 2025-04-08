@@ -1,3 +1,8 @@
+// Olivia Zino & Layann Wardeh
+// ozino, lwardeh 
+// Project 5 -- Due April 11 @ 5pm 
+// main.c 
+
 /*
 Main program for the virtual memory project.
 Make all of your modifications to this file.
@@ -27,8 +32,11 @@ unsigned char *virtmem = 0;
 /* A dummy page fault handler to start.  This is where most of your work goes. */
 void page_fault_handler( struct page_table *pt, int page )
 {
+	// page N maps directly to frame N: 
+	page_table_set_entry(pt, page, page, BIT_PRESENT | BIT_WRITE);
+	/* original dummy code
 	printf("page fault on page #%d\n",page);
-	exit(1);
+	exit(1); */
 }
 
 int main( int argc, char *argv[] )
