@@ -1,7 +1,7 @@
 /*
 Do not modify this file.
 Make all of your changes to main.c instead.
-*/ // program.h
+*/ 
 
 #ifndef PROGRAM_H
 #define PROGRAM_H

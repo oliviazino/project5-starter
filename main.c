@@ -79,59 +79,65 @@ int freeFrameFinder(struct page_table *pt, int page, int *kicked) {
     } else if (!strcmp(algoname, "custom")) {
         // what we have come up with = using frequency as a tiebreaker for CLOCK
 		int nframes = page_table_get_nframes(pt);
-    int start = hand;
-    int candidate = -1;
-    int lowestFreq = __INT_MAX__;
+    	int start = hand;
+		int candidate = -1;
+		int lowestFreq = __INT_MAX__;
 
-    while (1) {
-        if (refSeq[hand] == 0) {
-            int page = frame_table[hand];
-            if (frequency[hand] < lowestFreq) {
-                candidate = hand;
-                lowestFreq = frequency[hand];
-            }
-        } else {
-            refSeq[hand] = 0;
-        }
-        hand = (hand + 1) % nframes;
-       // we have returned back to 00:00 
-        if (hand == start) {
-            break;
-        }
-    }
-    if (candidate != -1) {
-        *kicked = frame_table[candidate];
-        hand = (candidate + 1) % nframes;
-        return candidate;
-    }
+		while (1) {
+			if (refSeq[hand] == 0) {
+				int page = frame_table[hand];
+				if (frequency[hand] < lowestFreq) {
+					candidate = hand;
+					lowestFreq = frequency[hand];
+				}
+			} else {
+				refSeq[hand] = 0;
+			}
+			hand = (hand + 1) % nframes;
+		// we have returned back to 00:00 
+			if (hand == start) {
+				break;
+			}
+		}
+		if (candidate != -1) {
+			*kicked = frame_table[candidate];
+			hand = (candidate + 1) % nframes;
+			return candidate;
+		}
 
-    // if all had 1 --> just use hand
-    *kicked = frame_table[hand];
-    int victim = hand;
-    hand = (hand + 1) % nframes;
-    return victim;
-	}
+		// if all had 1 --> just use hand
+		*kicked = frame_table[hand];
+		int victim = hand;
+		hand = (hand + 1) % nframes;
+		return victim;
+		}
 }
+
 /* A dummy page fault handler to start.  This is where most of your work goes. */
 void page_fault_handler(struct page_table *pt, int page )
 {
 	/* // try it out portion -- page N maps directly to frame N: 
 	page_table_set_entry(pt, page, page, BIT_PRESENT | BIT_WRITE); */
-	int kicked = -1;
-	int frame = freeFrameFinder(pt, page, &kicked);
-	page_table_set_entry(pt, page, frame, BIT_PRESENT);
+
 	/* original dummy code
 	printf("page fault on page #%d\n",page);
 	exit(1); */
 
-	// actual attempt: 
-	// int frame; 
-	//int bits; 
-	//page_table_get_entry(pt, page, &frame, &bits);
-
+	int frame; 
+	int bits; 
+	page_table_get_entry(pt, page, &frame, &bits);
+	faultCounter++;
+	
 	/* CASE 1 -- PAGE IS PRESENT - WRITE FAULT OCCURS */
+	if (bits & BIT_PRESENT) {
+		page_table_set_entry(pt, page, frame, bits | BIT_WRITE);
+		refSeq[frame] = 1;
+		frequency[frame]++; // update that it has been used 
+		return;
+	}
 
-	/* CASE 2 -- PAGE IS NOT PRESENT AND WE NEED TO FIND A FRAME */
+
+	/* CASE 2 -- PAGE IS NOT PRESENT -  NEED TO LOAD IT */
 }
 
 int main( int argc, char *argv[] )
