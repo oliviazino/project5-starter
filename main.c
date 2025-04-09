@@ -44,8 +44,16 @@ int* refSeq;
 /* to be used in custom alg */
 int *frequency;
 
+// TODO: implement stats 
+/* stats variables */ 
+int faultCounter = 0; 
+int reads2disk = 0; 
+int writes2disk = 0; 
+ 
+
 /* find an available frame using a selected replacement alg */
 int freeFrameFinder(struct page_table *pt, int page, int *kicked) { 
+	// TODO: make this work properly 
 	// is there a frame currently free to fill? 
 	for (int i = 0; i < page_table_get_nframes(pt); i++) {
 		if (frame_table[i] == -1) {
