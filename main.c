@@ -145,14 +145,8 @@ void page_fault_handler(struct page_table *pt, int page )
 	}
 
 	/* CASE 2 -- PAGE IS NOT PRESENT -  NEED TO LOAD IT */
-	int kicked = -1; 
-	frame = freeFrameFinder(pt, page, &kicked);
-
 	// bounce if things need to go 
-	if (kicked != -1)  { 
-		int ogFrame; 
-		int ogBits; 
-		page_table_get_entry(pt, kicked, &ogFrame, &ogBits);
+	
 		// TODO - actually access disk 
 	}
 }
