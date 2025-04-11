@@ -139,7 +139,7 @@ void page_fault_handler(struct page_table *pt, int page ) {
 	int replacement_frame = freeFrameFinder(pt, page, &kicked_page);
 		
 		// DEBUGGING 
-		// printf("FAULT: loading page %d into frame %d, evicting page %d\n", page, replacement_frame, kicked_page);
+		 printf("FAULT: loading page %d into frame %d, evicting page %d\n", page, replacement_frame, kicked_page);
 	
 		// error handling
 	if (replacement_frame < 0 || replacement_frame >= page_table_get_nframes(pt)) {
