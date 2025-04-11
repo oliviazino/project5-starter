@@ -34,7 +34,6 @@ int hand = 0; 	// hand of the clock
 int* refSeq; 	// for clock to compare to
 int *frequency; // to be used in custom alg 
 
-// TODO: implement stats 
 /* stats variables */ 
 int faultCounter = 0; 
 int reads2disk   = 0; 
@@ -43,7 +42,6 @@ int writes2disk  = 0;
 
 // find an available frame using a selected replacement alg 
 int freeFrameFinder(struct page_table *pt, int page, int *kicked) { 
-	// TODO: make this work properly 
 	// is there a frame currently free to fill? 
 	int nframes = page_table_get_nframes(pt); 
 
@@ -137,12 +135,13 @@ void page_fault_handler(struct page_table *pt, int page ) {
 
 	/* CASE 2 -- PAGE IS NOT PRESENT -  NEED TO LOAD IT */
 	// bounce if things need to go 
-		// TODO - actually access disk
 	int kicked_page;
 	int replacement_frame = freeFrameFinder(pt, page, &kicked_page);
-	// DEBUGGING 
+		
+		// DEBUGGING 
 		// printf("FAULT: loading page %d into frame %d, evicting page %d\n", page, replacement_frame, kicked_page);
-	// error handling
+	
+		// error handling
 	if (replacement_frame < 0 || replacement_frame >= page_table_get_nframes(pt)) {
 		fprintf(stderr, "Invalid frame index selected: %d\n", replacement_frame);
         exit(1);
@@ -173,20 +172,23 @@ void page_fault_handler(struct page_table *pt, int page ) {
 	reads2disk++;
 	page_table_set_entry(pt, page, replacement_frame, BIT_PRESENT | BIT_WRITE);
 
-	refSeq[replacement_frame]      = 1;
+	refSeq[replacement_frame] = 1;
 	frame_table[replacement_frame] = page; 
 	frequency[replacement_frame]++;
 }
 
 int main( int argc, char *argv[] )
 {
-	// perf tracking
+	// performance tracking
 	clock_t start_time = clock();
-	if(argc!=5) {
-		printf("use: virtmem <npages> <nframes> <rand|clock|custom> <alpha|beta|gamma|delta>\n");
+
+	// usage handling
+	if(argc!=5) { 
+		printf("usage: virtmem <npages> <nframes> <rand|clock|custom> <alpha|beta|gamma|delta>\n");
 		return 1;
 	}
 
+	// extract values from command line 
 	int npages = atoi(argv[1]);
 	int nframes = atoi(argv[2]);
 	algoname = argv[3];
@@ -239,7 +241,6 @@ int main( int argc, char *argv[] )
 	clock_t end_time = clock();    // End timing
 	double elapsed_time = ((double)(end_time - start_time)) / CLOCKS_PER_SEC;
 
-	
 	printf("Page Faults: %d\n", faultCounter);
 	printf("Disk Reads:  %d\n", reads2disk);
 	printf("Disk Writes: %d\n", writes2disk);
@@ -248,6 +249,6 @@ int main( int argc, char *argv[] )
 	disk_close(disk);
 
 	// performance tracking 
-	printf("Execution Time: %.6f seconds\n", elapsed_time);
+	printf("time to complete: %.6f s\n", elapsed_time);
 	return 0;
 }
